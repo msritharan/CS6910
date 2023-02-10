@@ -1,6 +1,8 @@
 '''
 get_inputs.py 
 initiates and assigns default values to parameters and processes command line arguments
+stops program for integer/float input errors
+continues with default values for string input errors
 '''
 
 import sys
@@ -41,7 +43,7 @@ while(pos < len(sys.argv)):
 
     elif variable in ["-d", "--dataset"]:
         if value in ["mnist", "fashion_mnist"]:
-            dataset = "fashion_mnist"
+            dataset = value
         else:
             print("Invalid Choice for dataset.")
             print("Assigning Default Value = fashion_mnist")
@@ -60,7 +62,7 @@ while(pos < len(sys.argv)):
     
     elif variable in ["-o", "--optimizer"]:
         if value in ["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"]:
-            dataset = "fashion_mnist"
+            optimizer = value
         else:
             print("Invalid Choice for optimizer.")
             print("Assigning Default Value = sgd")
@@ -89,7 +91,7 @@ while(pos < len(sys.argv)):
         except ValueError:
             print("Not a valid float for beta1")
 
-    elif variable in ["-beta", "--beta"]:
+    elif variable in ["-beta2", "--beta2"]:
         try:
             beta2 = float(value)
         except ValueError:
