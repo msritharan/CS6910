@@ -1,8 +1,7 @@
 '''
 get_inputs.py 
 initiates and assigns default values to parameters and processes command line arguments
-stops program for integer/float input errors
-continues with default values for string input errors
+continues with default values for input errors
 '''
 
 import sys
@@ -53,12 +52,14 @@ while(pos < len(sys.argv)):
             epochs = int(value)
         except ValueError:
             print("Not a valid number for epochs")
+            print("Proceeding with Default Value.")
     
     elif variable in ["-b", "--batch_size"]:
         try:
             batch_size = int(value)
         except ValueError:
             print("Not a valid number for batch_size")
+            print("Proceeding with Default Value.")
     
     elif variable in ["-o", "--optimizer"]:
         if value in ["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"]:
@@ -72,42 +73,49 @@ while(pos < len(sys.argv)):
             learning_rate = float(value)
         except ValueError:
             print("Not a valid float for learning_rate")
+            print("Proceeding with Default Value.")
     
     elif variable in ["-m", "--momentum"]:
         try:
             momentum = float(value)
         except ValueError:
             print("Not a valid float for momentum")
+            print("Proceeding with Default Value.")
     
     elif variable in ["-beta", "--beta"]:
         try:
             beta = float(value)
         except ValueError:
             print("Not a valid float for beta")
+            print("Proceeding with Default Value.")
     
     elif variable in ["-beta1", "--beta1"]:
         try:
             beta1 = float(value)
         except ValueError:
             print("Not a valid float for beta1")
+            print("Proceeding with Default Value.")
 
     elif variable in ["-beta2", "--beta2"]:
         try:
             beta2 = float(value)
         except ValueError:
             print("Not a valid float for beta2")
+            print("Proceeding with Default Value.")
     
     elif variable in ["-eps", "--epsilon"]:
         try:
             epsilon = float(value)
         except ValueError:
             print("Not a valid float for epsilon")
+            print("Proceeding with Default Value.")
 
     elif variable in ["-w_d", "--weight_decay"]:
         try:
             weight_decay = float(value)
         except ValueError:
             print("Not a valid float for weight_decay")
+            print("Proceeding with Default Value.")
 
     elif variable in ["-w_i", "--weight_init"]:
         if value in ["random", "Xavier"]:
@@ -121,12 +129,14 @@ while(pos < len(sys.argv)):
             num_layers = int(value)
         except ValueError:
             print("Not a valid int for num_layers")
+            print("Proceeding with Default Value.")
     
     elif variable in ["-sz", "--hidden_size"]:
         try:
             hidden_size = int(value)
         except ValueError:
             print("Not a valid int for hidden_size")
+            print("Proceeding with Default Value.")
 
     elif variable in ["-a", "--activation"]:
         if value in ["identity", "sigmoid", "tanh", "ReLU"]:
