@@ -33,7 +33,7 @@ class FeedforwardNN:
 
     def activate_layer(self, a):
         if self.activation == "identity":
-            return self.identity(x)
+            return self.identity(a)
         if self.activation == "sigmoid":
             return self.sigmoid(a)
         elif self.activation == "tanh":
