@@ -33,14 +33,15 @@ class FeedforwardNN:
 
     def activate_layer(self, a):
         if self.activation == "identity":
-            return a
+            return self.identity(x)
         if self.activation == "sigmoid":
             return self.sigmoid(a)
         elif self.activation == "tanh":
             return self.tanh(a)
         elif self.activation == "ReLU":
             return self.ReLU(a)
-        
+    
+    # activation functions
     def sigmoid(self, x):
         return 1/(1 + np.exp(-x))
     
@@ -50,23 +51,48 @@ class FeedforwardNN:
     def ReLU(self, x):
         return np.maximum(0, x)
 
+    def identity(self, x):
+        return x
+    
     def softmax(self, x):
         return np.exp(x)/sum(np.exp(x))
     
+    # gradients of activation functions
+    def grad_sigmoid(self, x):
+        return self.sigmoid(x)*(1 - self.sigmoid(x))
+    
+    def grad_tanh(self, x):
+        return 1 - (self.tanh(x))**2
+    
+    def grad_ReLU(self, x):
+        return (x >= 0)*1
+    
+    def grad_identity(self, x):
+        return 1
+    
+    def grad_softmax(self, x):
+        return np.diag(x) - np.outer(x, x)
+
     def forward_propagate(self, input):
         h = input
+        a_layer = [] # pre activation outputs of each layer
+        h_layer = [] # activated outputs of each layer
         # computes h till the last hidden layer
         for idx in range(len(self.weights) - 1):
             # compute pre activated output 'a'
             a = np.matmul(self.weights[idx].T, h)
             h = self.activate_layer(a)
+            a_layer.append(a)
+            h_layer.append(h)
         
         # output layer computation
         idx = len(self.weights) - 1
         a = np.matmul(self.weights[idx], h)
         h = self.softmax(a)
+        a_layer.append(a)
+        h_layer.append(h)
 
-        return h
+        return a_layer, h_layer, h
     
 
 
