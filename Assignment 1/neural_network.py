@@ -10,11 +10,11 @@ class FeedforwardNN:
         
         # weights between layers
         self.weights = []
-        self.weights.append(np.zeros(hidden_size, input_size))
+        self.weights.append(np.zeros((hidden_size, input_size)))
         layer_id = 1
         while(layer_id < num_layers):
-            self.weights.append(np.zeros(hidden_size, hidden_size))
-        self.weights.append(np.zeros(output_size, hidden_size))
+            self.weights.append(np.zeros((hidden_size, hidden_size)))
+        self.weights.append(np.zeros((output_size, hidden_size)))
 
         # bias for each layers
         self.bias = []
@@ -71,7 +71,7 @@ class FeedforwardNN:
         return (x >= 0)*1
     
     def grad_identity(self, x):
-        return 1
+        return np.ones(x.shape)
     
     def grad_softmax(self, x):
         return np.diag(x) - np.outer(x, x)
@@ -91,14 +91,15 @@ class FeedforwardNN:
         a_layer = [] # pre activation outputs of each layer
         h_layer = [] # activated outputs of each layer
         
-        for l in range(len(self.weights)):
-            a = self.bias[l] + self.weights[l]*h
+        for l in range(len(self.weights) - 1):
+            a = self.bias[l] + np.matmul(self.weights[l], h)
             h = self.activate_layer(a)
             a_layer.append(a)
             h_layer.append(h)
         
         L = len(self.weights) - 1
-        a = self.bias[L] + self.weights[L]*h
+        print(self.weights[L].shape, h.shape)
+        a = self.bias[L] + np.matmul(self.weights[L], h)
         h = self.softmax(a) 
         a_layer.append(a)
         h_layer.append(h) 
@@ -116,7 +117,7 @@ class FeedforwardNN:
 
         # propagate backwards
         g_a = -(e_y - ypred)
-        for l in range(L, -1, -1):
+        for l in range(L - 1, -1, -1):
             # gradients wrt weights and bias
             g_Wl = np.outer(g_a, h_layer[l])
             g_bl = g_a
@@ -124,8 +125,9 @@ class FeedforwardNN:
             grad_b.append(g_bl)
 
             #  gradients wrt layer below
-            g_h = self.weights[l].T*g_a
-            g_a = g_h*self.grad_activate(a_layer[l])
+            g_h = np.matmul(self.weights[l + 1].T, g_a)
+            print(g_h.shape, a_layer[l].shape)
+            g_a = np.matmul(g_h, self.grad_activate(a_layer[l]))
 
         grad_W.reverse()
         grad_b.reverse()

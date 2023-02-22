@@ -8,3 +8,6 @@ from keras.datasets import fashion_mnist
 plt.figure()
 plt.imshow(x_train[0], cmap = 'gray')
 plt.show()
+
+print(x_train.shape)
+print(y_train.shape)
