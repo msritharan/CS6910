@@ -88,8 +88,8 @@ class FeedforwardNN:
         
     def forward_propagate(self, input):
         h = input
-        a_layer = [] # pre activation outputs of each layer
-        h_layer = [] # activated outputs of each layer
+        a_layer = [h] # pre activation outputs of each layer
+        h_layer = [h] # activated outputs of each layer
         
         for l in range(len(self.weights) - 1):
             a = self.bias[l] + np.matmul(self.weights[l], h)
@@ -98,7 +98,6 @@ class FeedforwardNN:
             h_layer.append(h)
         
         L = len(self.weights) - 1
-        print(self.weights[L].shape, h.shape)
         a = self.bias[L] + np.matmul(self.weights[L], h)
         h = self.softmax(a) 
         a_layer.append(a)
@@ -124,15 +123,32 @@ class FeedforwardNN:
             grad_W.append(g_Wl)
             grad_b.append(g_bl)
 
-            #  gradients wrt layer below
-            g_h = np.matmul(self.weights[l + 1].T, g_a)
-            print(g_h.shape, a_layer[l].shape)
-            g_a = np.matmul(g_h, self.grad_activate(a_layer[l]))
+            if(l == 0):
+                break
+            else:
+                #  gradients wrt layer below
+                g_h = np.matmul(self.weights[l].T, g_a)
+                g_a = g_h*self.grad_activate(a_layer[l])
 
         grad_W.reverse()
         grad_b.reverse()
 
         return grad_W, grad_b
+    
+    def predict(self, x):
+        a, h, y = self.forward_propagate(x)
+        ypred = np.argmax(y)
+        return ypred
+    
+    def evaluate(self, X, Y):
+        correct = 0
+        for idx in range(len(X)):
+            pred = self.predict(X[idx])
+            if pred == Y[idx]:
+                correct += 1
+        
+        return float(correct)/len(X)
+
 
 
 

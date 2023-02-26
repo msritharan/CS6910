@@ -1,13 +1,33 @@
 from get_inputs import *
+from neural_network import *
+from optimizers import *
+
 import numpy as np
 from matplotlib import pyplot as plt
 from keras.datasets import fashion_mnist
 
 # Q1 - load dataset
 (x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
-plt.figure()
-plt.imshow(x_train[0], cmap = 'gray')
-plt.show()
+x_train = x_train.reshape(60000, -1)/255
+x_test = x_test.reshape(x_test.shape[0], -1)/255
 
-print(x_train.shape)
-print(y_train.shape)
+# plt.figure()
+# plt.imshow(x_train[0], cmap = 'gray')
+# plt.show()
+
+epochs = 10
+
+X = x_train[:40000]
+Y = y_train[:40000]
+
+model = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
+W, b = sgd(model, learning_rate, batch_size, epochs, X, Y, x_test, y_test)
+model.weights = W
+model.bias = b
+print(model.evaluate(x_test, y_test))
+
+model1 = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
+W, b = momentum_sgd(model1, learning_rate, batch_size, epochs, momentum, X, Y, x_test, y_test)
+model1.weights = W
+model1.bias = b
+print(model1.evaluate(x_test, y_test))
