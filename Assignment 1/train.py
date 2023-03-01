@@ -15,10 +15,10 @@ x_test = x_test.reshape(x_test.shape[0], -1)/255
 # plt.imshow(x_train[0], cmap = 'gray')
 # plt.show()
 
-epochs = 25
+epochs = 10
 
-X = x_train[:40000]
-Y = y_train[:40000]
+X = x_train[:10000]
+Y = y_train[:10000]
 
 # model = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
 # W, b = sgd(model, learning_rate, batch_size, epochs, X, Y, x_test, y_test)
@@ -49,3 +49,9 @@ W, b = adam(model4, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X,
 model4.weights = W
 model4.bias = b
 print(model4.evaluate(x_test, y_test))
+
+model5 = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
+W, b = nadam(model5, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, Y, x_test, y_test)
+model5.weights = W
+model5.bias = b
+print(model5.evaluate(x_test, y_test))
