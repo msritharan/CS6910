@@ -46,7 +46,7 @@ class FeedforwardNN:
     
     # activation functions
     def sigmoid(self, x):
-        return 1/(1 + np.exp(-x))
+        return (1 / (1 + np.exp(-x)))
     
     def tanh(self, x):
         return (np.exp(x) - np.exp(-x))/(np.exp(x) + np.exp(-x))
@@ -58,6 +58,7 @@ class FeedforwardNN:
         return x
     
     def softmax(self, x):
+        # numerically stable softmax
         z = x - max(x)
         return np.exp(z)/sum(np.exp(z))
     
