@@ -58,7 +58,8 @@ class FeedforwardNN:
         return x
     
     def softmax(self, x):
-        return np.exp(x)/sum(np.exp(x))
+        z = x - max(x)
+        return np.exp(z)/sum(np.exp(z))
     
     # gradients of activation functions
     def grad_sigmoid(self, x):
