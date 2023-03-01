@@ -232,12 +232,67 @@ def adam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, Y
                     normal_M_b = M_b[idx2]/(1 - pow(beta1, t))
                     normal_V_w = V_w[idx2]/(1 - pow(beta2, t))
                     normal_V_b = V_b[idx2]/(1 - pow(beta2, t))
-                    
-                    t += 1
 
                     W[idx2] -= learning_rate*normal_M_w/(np.sqrt(normal_V_w) + epsilon)
                     b[idx2] -= learning_rate*normal_M_b/(np.sqrt(normal_V_b) + epsilon)
+                
+                t += 1
+                NNmodel.weights = W
+                NNmodel.bias = b
+                gW = [np.zeros(W[idx].shape) for idx in range(len(W))]
+                gb = [np.zeros(b[idx].shape) for idx in range(len(b))]
+        
+        epoch_acc = NNmodel.evaluate(Xval, Yval)
+        print("Epoch : ", iter, "Accuracy : ", epoch_acc*100)
+        iter_test_acc.append(epoch_acc)
+    
+    # plt.figure()
+    # plt.plot(iter_test_acc)
+    # plt.show()
+    
+    return NNmodel.weights, NNmodel.bias
 
+def nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, Y, Xval, Yval):
+    iter_test_acc = []
+    for iter in range(epochs):
+        
+        W = NNmodel.weights
+        b = NNmodel.bias
+        gW = [np.zeros(W[idx].shape) for idx in range(len(W))]
+        gb = [np.zeros(b[idx].shape) for idx in range(len(b))]
+
+        sample_indices = np.arange(len(X))
+        np.random.shuffle(sample_indices)
+        M_w = [np.zeros(W[idx].shape) for idx in range(len(W))]
+        M_b = [np.zeros(b[idx].shape) for idx in range(len(b))]
+        V_w = [np.zeros(W[idx].shape) for idx in range(len(W))]
+        V_b = [np.zeros(b[idx].shape) for idx in range(len(b))]
+
+        t = 1
+        for idx in range(len(X)):
+            a, h, y = NNmodel.forward_propagate(X[sample_indices[idx]])
+            grad_W, grad_b = NNmodel.back_propagation(a, h, y, Y[sample_indices[idx]])
+            for idx2 in range(len(grad_W)):
+                gW[idx2] += grad_W[idx2]
+                gb[idx2] += grad_b[idx2]
+
+            # end of a batch or end of array
+            if ((idx + 1)%batch_size == 0) or (idx == len(X) - 1):
+                for idx2 in range(len(W)):
+                    M_w[idx2] = beta1*M_w[idx2] + (1 - beta1)*(gW[idx2])
+                    M_b[idx2] = beta1*M_b[idx2] + (1 - beta1)*(gb[idx2])
+                    V_w[idx2] = beta2*V_w[idx2] + (1 - beta2)*(gW[idx2]**2)
+                    V_b[idx2] = beta2*V_b[idx2] + (1 - beta2)*(gb[idx2]**2)
+                    
+                    normal_M_w = M_w[idx2]/(1 - pow(beta1, t))
+                    normal_M_b = M_b[idx2]/(1 - pow(beta1, t))
+                    normal_V_w = V_w[idx2]/(1 - pow(beta2, t))
+                    normal_V_b = V_b[idx2]/(1 - pow(beta2, t))
+
+                    W[idx2] -= learning_rate*(beta1*normal_M_w + (1 - beta1)*gW[idx2]/(1 - pow(beta1, t)))/(np.sqrt(normal_V_w) + epsilon)
+                    b[idx2] -= learning_rate*(beta1*normal_M_b + (1 - beta1)*gb[idx2]/(1 - pow(beta1, t)))/(np.sqrt(normal_V_b) + epsilon)
+
+                t += 1
                 NNmodel.weights = W
                 NNmodel.bias = b
                 gW = [np.zeros(W[idx].shape) for idx in range(len(W))]
