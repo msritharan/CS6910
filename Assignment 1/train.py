@@ -17,8 +17,8 @@ x_test = x_test.reshape(x_test.shape[0], -1)/255
 
 epochs = 10
 
-X = x_train[:40000]
-Y = y_train[:40000]
+X = x_train[:10000]
+Y = y_train[:10000]
 
 model = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
 W, b = sgd(model, learning_rate, batch_size, epochs, X, Y, x_test, y_test)
@@ -31,3 +31,9 @@ W, b = momentum_sgd(model1, learning_rate, batch_size, epochs, momentum, X, Y, x
 model1.weights = W
 model1.bias = b
 print(model1.evaluate(x_test, y_test))
+
+model2 = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
+W, b = nag(model2, learning_rate, batch_size, epochs, momentum, X, Y, x_test, y_test)
+model2.weights = W
+model2.bias = b
+print(model2.evaluate(x_test, y_test))
