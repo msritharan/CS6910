@@ -20,20 +20,26 @@ epochs = 10
 X = x_train[:10000]
 Y = y_train[:10000]
 
-model = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
-W, b = sgd(model, learning_rate, batch_size, epochs, X, Y, x_test, y_test)
-model.weights = W
-model.bias = b
-print(model.evaluate(x_test, y_test))
+# model = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
+# W, b = sgd(model, learning_rate, batch_size, epochs, X, Y, x_test, y_test)
+# model.weights = W
+# model.bias = b
+# print(model.evaluate(x_test, y_test))
 
-model1 = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
-W, b = momentum_sgd(model1, learning_rate, batch_size, epochs, momentum, X, Y, x_test, y_test)
-model1.weights = W
-model1.bias = b
-print(model1.evaluate(x_test, y_test))
+# model1 = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
+# W, b = momentum_sgd(model1, learning_rate, batch_size, epochs, momentum, X, Y, x_test, y_test)
+# model1.weights = W
+# model1.bias = b
+# print(model1.evaluate(x_test, y_test))
 
-model2 = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
-W, b = nag(model2, learning_rate, batch_size, epochs, momentum, X, Y, x_test, y_test)
-model2.weights = W
-model2.bias = b
-print(model2.evaluate(x_test, y_test))
+# model2 = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
+# W, b = nag(model2, learning_rate, batch_size, epochs, momentum, X, Y, x_test, y_test)
+# model2.weights = W
+# model2.bias = b
+# print(model2.evaluate(x_test, y_test))
+
+model3 = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
+W, b = rmsprop(model3, learning_rate, batch_size, epochs, beta, epsilon, X, Y, x_test, y_test)
+model3.weights = W
+model3.bias = b
+print(model3.evaluate(x_test, y_test))
