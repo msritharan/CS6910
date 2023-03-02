@@ -3,8 +3,12 @@ import matplotlib.pyplot as plt
 # from neural_network import *
 # NNmodel = FeedforwardNN()
 
-def sgd(NNmodel, learning_rate, batch_size, epochs, X, Y, Xval, Yval):
-    iter_test_acc = []
+def sgd(NNmodel, learning_rate, batch_size, epochs, Xtrain, Ytrain, Xval, Yval):
+    train_accuracy = []
+    train_loss = []
+    val_accuracy = []
+    val_loss = []
+
     for iter in range(epochs):
         
         W = NNmodel.weights
@@ -12,18 +16,18 @@ def sgd(NNmodel, learning_rate, batch_size, epochs, X, Y, Xval, Yval):
         gW = [np.zeros(W[idx].shape) for idx in range(len(W))]
         gb = [np.zeros(b[idx].shape) for idx in range(len(b))]
 
-        sample_indices = np.arange(len(X))
+        sample_indices = np.arange(len(Xtrain))
         np.random.shuffle(sample_indices)
 
-        for idx in range(len(X)):
-            a, h, y = NNmodel.forward_propagate(X[sample_indices[idx]])
-            grad_W, grad_b = NNmodel.back_propagation(a, h, y, Y[sample_indices[idx]])
+        for idx in range(len(Xtrain)):
+            a, h, y = NNmodel.forward_propagate(Xtrain[sample_indices[idx]])
+            grad_W, grad_b = NNmodel.back_propagation(a, h, y, Ytrain[sample_indices[idx]])
             for idx2 in range(len(grad_W)):
                 gW[idx2] += grad_W[idx2]
                 gb[idx2] += grad_b[idx2]
 
             # end of a batch or end of array
-            if ((idx + 1)%batch_size == 0) or (idx == len(X) - 1):
+            if ((idx + 1)%batch_size == 0) or (idx == len(Xtrain) - 1):
                 for idx2 in range(len(W)):
                     W[idx2] -= learning_rate*gW[idx2]
                     b[idx2] -= learning_rate*gb[idx2]
@@ -33,18 +37,22 @@ def sgd(NNmodel, learning_rate, batch_size, epochs, X, Y, Xval, Yval):
                 gW = [np.zeros(W[idx].shape) for idx in range(len(W))]
                 gb = [np.zeros(b[idx].shape) for idx in range(len(b))]
         
-        epoch_acc = NNmodel.evaluate(Xval, Yval)
-        print("Epoch : ", iter, "Accuracy : ", epoch_acc*100)
-        iter_test_acc.append(epoch_acc)
-    
-    # plt.figure()
-    # plt.plot(iter_test_acc)
-    # plt.show()
-    
-    return NNmodel.weights, NNmodel.bias
+        train_acc, train_cost = NNmodel.evaluate_metrics(Xtrain, Ytrain)
+        val_acc, val_cost = NNmodel.evaluate_metrics(Xval, Yval)
+        print("Epoch : ", iter + 1, "Train Accuracy = ", train_acc, "Val Accuracy = ", val_acc)
+        train_accuracy.append(train_acc)
+        train_loss.append(train_cost) 
+        val_accuracy.append(val_acc)
+        val_loss.append(val_cost)
 
-def momentum_sgd(NNmodel, learning_rate, batch_size, epochs, momentum, X, Y, Xval, Yval):
-    iter_test_acc = []
+    return NNmodel.weights, NNmodel.bias, train_accuracy, train_loss, val_accuracy, val_loss
+
+def momentum_sgd(NNmodel, learning_rate, batch_size, epochs, momentum, Xtrain, Ytrain, Xval, Yval):
+    train_accuracy = []
+    train_loss = []
+    val_accuracy = []
+    val_loss = []
+
     for iter in range(epochs):
         
         W = NNmodel.weights
@@ -52,20 +60,20 @@ def momentum_sgd(NNmodel, learning_rate, batch_size, epochs, momentum, X, Y, Xva
         gW = [np.zeros(W[idx].shape) for idx in range(len(W))]
         gb = [np.zeros(b[idx].shape) for idx in range(len(b))]
 
-        sample_indices = np.arange(len(X))
+        sample_indices = np.arange(len(Xtrain))
         np.random.shuffle(sample_indices)
         hist_update_W = [np.zeros(W[idx].shape) for idx in range(len(W))]
         hist_update_b = [np.zeros(b[idx].shape) for idx in range(len(b))]
 
-        for idx in range(len(X)):
-            a, h, y = NNmodel.forward_propagate(X[sample_indices[idx]])
-            grad_W, grad_b = NNmodel.back_propagation(a, h, y, Y[sample_indices[idx]])
+        for idx in range(len(Xtrain)):
+            a, h, y = NNmodel.forward_propagate(Xtrain[sample_indices[idx]])
+            grad_W, grad_b = NNmodel.back_propagation(a, h, y, Ytrain[sample_indices[idx]])
             for idx2 in range(len(grad_W)):
                 gW[idx2] += grad_W[idx2]
                 gb[idx2] += grad_b[idx2]
 
             # end of a batch or end of array
-            if ((idx + 1)%batch_size == 0) or (idx == len(X) - 1):
+            if ((idx + 1)%batch_size == 0) or (idx == len(Xtrain) - 1):
                 update_W = [momentum*hist_update_W[idx] for idx in range(len(hist_update_W))]
                 update_b = [momentum*hist_update_b[idx] for idx in range(len(hist_update_b))]
 
@@ -83,18 +91,22 @@ def momentum_sgd(NNmodel, learning_rate, batch_size, epochs, momentum, X, Y, Xva
                 gW = [np.zeros(W[idx].shape) for idx in range(len(W))]
                 gb = [np.zeros(b[idx].shape) for idx in range(len(b))]
         
-        epoch_acc = NNmodel.evaluate(Xval, Yval)
-        print("Epoch : ", iter, "Accuracy : ", epoch_acc*100)
-        iter_test_acc.append(epoch_acc)
+        train_acc, train_cost = NNmodel.evaluate_metrics(Xtrain, Ytrain)
+        val_acc, val_cost = NNmodel.evaluate_metrics(Xval, Yval)
+        print("Epoch : ", iter + 1, "Train Accuracy = ", train_acc, "Val Accuracy = ", val_acc)
+        train_accuracy.append(train_acc)
+        train_loss.append(train_cost) 
+        val_accuracy.append(val_acc)
+        val_loss.append(val_cost)
     
-    # plt.figure()
-    # plt.plot(iter_test_acc)
-    # plt.show()
-    
-    return NNmodel.weights, NNmodel.bias
+    return NNmodel.weights, NNmodel.bias, train_accuracy, train_loss, val_accuracy, val_loss
 
-def nag(NNmodel, learning_rate, batch_size, epochs, momentum, X, Y, Xval, Yval):
-    iter_test_acc = []
+def nag(NNmodel, learning_rate, batch_size, epochs, momentum, Xtrain, Ytrain, Xval, Yval):
+    train_accuracy = []
+    train_loss = []
+    val_accuracy = []
+    val_loss = []
+
     for iter in range(epochs):
         
         W = NNmodel.weights
@@ -102,22 +114,22 @@ def nag(NNmodel, learning_rate, batch_size, epochs, momentum, X, Y, Xval, Yval):
         gW = [np.zeros(W[idx].shape) for idx in range(len(W))]
         gb = [np.zeros(b[idx].shape) for idx in range(len(b))]
 
-        sample_indices = np.arange(len(X))
+        sample_indices = np.arange(len(Xtrain))
         np.random.shuffle(sample_indices)
         hist_update_W = [np.zeros(W[idx].shape) for idx in range(len(W))]
         hist_update_b = [np.zeros(b[idx].shape) for idx in range(len(b))]
         update_W = [np.zeros(W[idx].shape) for idx in range(len(W))]
         update_b = [np.zeros(b[idx].shape) for idx in range(len(b))]
 
-        for idx in range(len(X)):
-            a, h, y = NNmodel.forward_propagate(X[sample_indices[idx]])
-            grad_W, grad_b = NNmodel.back_propagation(a, h, y, Y[sample_indices[idx]])
+        for idx in range(len(Xtrain)):
+            a, h, y = NNmodel.forward_propagate(Xtrain[sample_indices[idx]])
+            grad_W, grad_b = NNmodel.back_propagation(a, h, y, Ytrain[sample_indices[idx]])
             for idx2 in range(len(grad_W)):
                 gW[idx2] += grad_W[idx2]
                 gb[idx2] += grad_b[idx2]
 
             # end of a batch or end of array - move by accumulated gradients
-            if ((idx + 1)%batch_size == 0) or (idx == len(X) - 1):
+            if ((idx + 1)%batch_size == 0) or (idx == len(Xtrain) - 1):
                 # move by gW as you would already moved by beta*u(t - 1) at the end of the previous batch
                 for idx2 in range(len(W)):
                     update_W[idx2] += (gW[idx2])
@@ -134,25 +146,29 @@ def nag(NNmodel, learning_rate, batch_size, epochs, momentum, X, Y, Xval, Yval):
                 gb = [np.zeros(b[idx].shape) for idx in range(len(b))]
             
             # move by beta*u(t - 1) for next step, however don't do it for the last batch
-            if ((idx + 1)%batch_size == 0) and (idx != len(X) - 1):
+            if ((idx + 1)%batch_size == 0) and (idx != len(Xtrain) - 1):
                 update_W = [momentum*hist_update_W[idx] for idx in range(len(hist_update_W))]
                 update_b = [momentum*hist_update_b[idx] for idx in range(len(hist_update_b))]
                 for idx2 in range(len(W)):
                     W[idx2] -= learning_rate*update_W[idx2]
                     b[idx2] -= learning_rate*update_b[idx2]
         
-        epoch_acc = NNmodel.evaluate(Xval, Yval)
-        print("Epoch : ", iter, "Accuracy : ", epoch_acc*100)
-        iter_test_acc.append(epoch_acc)
+        train_acc, train_cost = NNmodel.evaluate_metrics(Xtrain, Ytrain)
+        val_acc, val_cost = NNmodel.evaluate_metrics(Xval, Yval)
+        print("Epoch : ", iter + 1, "Train Accuracy = ", train_acc, "Val Accuracy = ", val_acc)
+        train_accuracy.append(train_acc)
+        train_loss.append(train_cost) 
+        val_accuracy.append(val_acc)
+        val_loss.append(val_cost)
     
-    # plt.figure()
-    # plt.plot(iter_test_acc)
-    # plt.show()
-    
-    return NNmodel.weights, NNmodel.bias
+    return NNmodel.weights, NNmodel.bias, train_accuracy, train_loss, val_accuracy, val_loss
 
-def rmsprop(NNmodel, learning_rate, batch_size, epochs, beta, epsilon, X, Y, Xval, Yval):
-    iter_test_acc = []
+def rmsprop(NNmodel, learning_rate, batch_size, epochs, beta, epsilon, Xtrain, Ytrain, Xval, Yval):
+    train_accuracy = []
+    train_loss = []
+    val_accuracy = []
+    val_loss = []
+
     for iter in range(epochs):
         
         W = NNmodel.weights
@@ -160,20 +176,20 @@ def rmsprop(NNmodel, learning_rate, batch_size, epochs, beta, epsilon, X, Y, Xva
         gW = [np.zeros(W[idx].shape) for idx in range(len(W))]
         gb = [np.zeros(b[idx].shape) for idx in range(len(b))]
 
-        sample_indices = np.arange(len(X))
+        sample_indices = np.arange(len(Xtrain))
         np.random.shuffle(sample_indices)
         V_w = [np.zeros(W[idx].shape) for idx in range(len(W))]
         V_b = [np.zeros(b[idx].shape) for idx in range(len(b))]
 
-        for idx in range(len(X)):
-            a, h, y = NNmodel.forward_propagate(X[sample_indices[idx]])
-            grad_W, grad_b = NNmodel.back_propagation(a, h, y, Y[sample_indices[idx]])
+        for idx in range(len(Xtrain)):
+            a, h, y = NNmodel.forward_propagate(Xtrain[sample_indices[idx]])
+            grad_W, grad_b = NNmodel.back_propagation(a, h, y, Ytrain[sample_indices[idx]])
             for idx2 in range(len(grad_W)):
                 gW[idx2] += grad_W[idx2]
                 gb[idx2] += grad_b[idx2]
 
             # end of a batch or end of array
-            if ((idx + 1)%batch_size == 0) or (idx == len(X) - 1):
+            if ((idx + 1)%batch_size == 0) or (idx == len(Xtrain) - 1):
                 for idx2 in range(len(W)):
                     V_w[idx2] = beta*V_w[idx2] + (1 - beta)*(gW[idx2]**2)
                     V_b[idx2] = beta*V_b[idx2] + (1 - beta)*(gb[idx2]**2)
@@ -186,18 +202,22 @@ def rmsprop(NNmodel, learning_rate, batch_size, epochs, beta, epsilon, X, Y, Xva
                 gW = [np.zeros(W[idx].shape) for idx in range(len(W))]
                 gb = [np.zeros(b[idx].shape) for idx in range(len(b))]
         
-        epoch_acc = NNmodel.evaluate(Xval, Yval)
-        print("Epoch : ", iter, "Accuracy : ", epoch_acc*100)
-        iter_test_acc.append(epoch_acc)
+        train_acc, train_cost = NNmodel.evaluate_metrics(Xtrain, Ytrain)
+        val_acc, val_cost = NNmodel.evaluate_metrics(Xval, Yval)
+        print("Epoch : ", iter + 1, "Train Accuracy = ", train_acc, "Val Accuracy = ", val_acc)
+        train_accuracy.append(train_acc)
+        train_loss.append(train_cost) 
+        val_accuracy.append(val_acc)
+        val_loss.append(val_cost)
     
-    # plt.figure()
-    # plt.plot(iter_test_acc)
-    # plt.show()
-    
-    return NNmodel.weights, NNmodel.bias
+    return NNmodel.weights, NNmodel.bias, train_accuracy, train_loss, val_accuracy, val_loss
 
-def adam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, Y, Xval, Yval):
-    iter_test_acc = []
+def adam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval):
+    train_accuracy = []
+    train_loss = []
+    val_accuracy = []
+    val_loss = []
+
     for iter in range(epochs):
         
         W = NNmodel.weights
@@ -205,7 +225,7 @@ def adam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, Y
         gW = [np.zeros(W[idx].shape) for idx in range(len(W))]
         gb = [np.zeros(b[idx].shape) for idx in range(len(b))]
 
-        sample_indices = np.arange(len(X))
+        sample_indices = np.arange(len(Xtrain))
         np.random.shuffle(sample_indices)
         M_w = [np.zeros(W[idx].shape) for idx in range(len(W))]
         M_b = [np.zeros(b[idx].shape) for idx in range(len(b))]
@@ -213,15 +233,15 @@ def adam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, Y
         V_b = [np.zeros(b[idx].shape) for idx in range(len(b))]
 
         t = 1
-        for idx in range(len(X)):
-            a, h, y = NNmodel.forward_propagate(X[sample_indices[idx]])
-            grad_W, grad_b = NNmodel.back_propagation(a, h, y, Y[sample_indices[idx]])
+        for idx in range(len(Xtrain)):
+            a, h, y = NNmodel.forward_propagate(Xtrain[sample_indices[idx]])
+            grad_W, grad_b = NNmodel.back_propagation(a, h, y, Ytrain[sample_indices[idx]])
             for idx2 in range(len(grad_W)):
                 gW[idx2] += grad_W[idx2]
                 gb[idx2] += grad_b[idx2]
 
             # end of a batch or end of array
-            if ((idx + 1)%batch_size == 0) or (idx == len(X) - 1):
+            if ((idx + 1)%batch_size == 0) or (idx == len(Xtrain) - 1):
                 for idx2 in range(len(W)):
                     M_w[idx2] = beta1*M_w[idx2] + (1 - beta1)*(gW[idx2])
                     M_b[idx2] = beta1*M_b[idx2] + (1 - beta1)*(gb[idx2])
@@ -242,18 +262,22 @@ def adam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, Y
                 gW = [np.zeros(W[idx].shape) for idx in range(len(W))]
                 gb = [np.zeros(b[idx].shape) for idx in range(len(b))]
         
-        epoch_acc = NNmodel.evaluate(Xval, Yval)
-        print("Epoch : ", iter, "Accuracy : ", epoch_acc*100)
-        iter_test_acc.append(epoch_acc)
+        train_acc, train_cost = NNmodel.evaluate_metrics(Xtrain, Ytrain)
+        val_acc, val_cost = NNmodel.evaluate_metrics(Xval, Yval)
+        print("Epoch : ", iter + 1, "Train Accuracy = ", train_acc, "Val Accuracy = ", val_acc)
+        train_accuracy.append(train_acc)
+        train_loss.append(train_cost) 
+        val_accuracy.append(val_acc)
+        val_loss.append(val_cost)
     
-    # plt.figure()
-    # plt.plot(iter_test_acc)
-    # plt.show()
-    
-    return NNmodel.weights, NNmodel.bias
+    return NNmodel.weights, NNmodel.bias, train_accuracy, train_loss, val_accuracy, val_loss
 
-def nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, Y, Xval, Yval):
-    iter_test_acc = []
+def nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval):
+    train_accuracy = []
+    train_loss = []
+    val_accuracy = []
+    val_loss = []
+
     for iter in range(epochs):
         
         W = NNmodel.weights
@@ -261,7 +285,7 @@ def nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, 
         gW = [np.zeros(W[idx].shape) for idx in range(len(W))]
         gb = [np.zeros(b[idx].shape) for idx in range(len(b))]
 
-        sample_indices = np.arange(len(X))
+        sample_indices = np.arange(len(Xtrain))
         np.random.shuffle(sample_indices)
         M_w = [np.zeros(W[idx].shape) for idx in range(len(W))]
         M_b = [np.zeros(b[idx].shape) for idx in range(len(b))]
@@ -269,15 +293,15 @@ def nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, 
         V_b = [np.zeros(b[idx].shape) for idx in range(len(b))]
 
         t = 1
-        for idx in range(len(X)):
-            a, h, y = NNmodel.forward_propagate(X[sample_indices[idx]])
-            grad_W, grad_b = NNmodel.back_propagation(a, h, y, Y[sample_indices[idx]])
+        for idx in range(len(Xtrain)):
+            a, h, y = NNmodel.forward_propagate(Xtrain[sample_indices[idx]])
+            grad_W, grad_b = NNmodel.back_propagation(a, h, y, Ytrain[sample_indices[idx]])
             for idx2 in range(len(grad_W)):
                 gW[idx2] += grad_W[idx2]
                 gb[idx2] += grad_b[idx2]
 
             # end of a batch or end of array
-            if ((idx + 1)%batch_size == 0) or (idx == len(X) - 1):
+            if ((idx + 1)%batch_size == 0) or (idx == len(Xtrain) - 1):
                 for idx2 in range(len(W)):
                     M_w[idx2] = beta1*M_w[idx2] + (1 - beta1)*(gW[idx2])
                     M_b[idx2] = beta1*M_b[idx2] + (1 - beta1)*(gb[idx2])
@@ -298,28 +322,29 @@ def nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, 
                 gW = [np.zeros(W[idx].shape) for idx in range(len(W))]
                 gb = [np.zeros(b[idx].shape) for idx in range(len(b))]
         
-        epoch_acc = NNmodel.evaluate(Xval, Yval)
-        print("Epoch : ", iter, "Accuracy : ", epoch_acc*100)
-        iter_test_acc.append(epoch_acc)
+        train_acc, train_cost = NNmodel.evaluate_metrics(Xtrain, Ytrain)
+        val_acc, val_cost = NNmodel.evaluate_metrics(Xval, Yval)
+        print("Epoch : ", iter + 1, "Train Accuracy = ", train_acc, "Val Accuracy = ", val_acc)
+        train_accuracy.append(train_acc)
+        train_loss.append(train_cost) 
+        val_accuracy.append(val_acc)
+        val_loss.append(val_cost)
     
-    # plt.figure()
-    # plt.plot(iter_test_acc)
-    # plt.show()
-    
-    return NNmodel.weights, NNmodel.bias
+    return NNmodel.weights, NNmodel.bias, train_accuracy, train_loss, val_accuracy, val_loss
 
-def train_model(NNmodel, optimizer, learning_rate, batch_size, epochs, momentum, beta, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval):
+def train_model(NNmodel, optimizer, learning_rate, batch_size, epochs, momentum, beta, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval, active_wandb = False):
+    # train_accuracy, train_loss, val_accuracy, val_loss
     if optimizer == "sgd":
-        NNmodel.weights, NNmodel.bias = sgd(NNmodel, learning_rate, batch_size, epochs, Xtrain, Ytrain, Xval, Yval)
+        NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss = sgd(NNmodel, learning_rate, batch_size, epochs, Xtrain, Ytrain, Xval, Yval)
     elif optimizer == "momentum":
-        NNmodel.weights, NNmodel.bias = momentum_sgd(NNmodel, learning_rate, batch_size, epochs, momentum, Xtrain, Ytrain, Xval, Yval)
+        NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss = momentum_sgd(NNmodel, learning_rate, batch_size, epochs, momentum, Xtrain, Ytrain, Xval, Yval)
     elif optimizer == "nesterov":
-        NNmodel.weights, NNmodel.bias = nag(NNmodel, learning_rate, batch_size, epochs, momentum, Xtrain, Ytrain, Xval, Yval)
+        NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss = nag(NNmodel, learning_rate, batch_size, epochs, momentum, Xtrain, Ytrain, Xval, Yval)
     elif optimizer == "rmsprop":
-        NNmodel.weights, NNmodel.bias = rmsprop(NNmodel, learning_rate, batch_size, epochs, beta, epsilon, Xtrain, Ytrain, Xval, Yval)
+        NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss = rmsprop(NNmodel, learning_rate, batch_size, epochs, beta, epsilon, Xtrain, Ytrain, Xval, Yval)
     elif optimizer == "adam":
-        NNmodel.weights, NNmodel.bias = adam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
+        NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss = adam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
     elif optimizer == "nadam":
-        NNmodel.weights, NNmodel.bias = nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
+        NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss = nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
 
-    return NNmodel.weights, NNmodel.bias
+    return NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss
