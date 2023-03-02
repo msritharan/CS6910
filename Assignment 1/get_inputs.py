@@ -12,7 +12,7 @@ wandb_entity = "manikandan_sritharan"
 dataset = "fashion_mnist"
 epochs = 1
 batch_size = 4
-loss = "cross_entropy"
+loss_function = "cross_entropy"
 optimizer = "sgd"
 learning_rate = 0.1
 momentum = 0.5
@@ -61,6 +61,13 @@ while(pos < len(sys.argv)):
             print("Not a valid number for batch_size")
             print("Proceeding with Default Value.")
     
+    elif variable in ["-b", "--loss"]:
+        if value in ["mean_squared_error", "cross_entropy"]:
+            loss_function = value
+        else:
+            print("Invalid choice for Loss Function.")
+            print("Assigning Default Value = cross_entropy")
+            
     elif variable in ["-o", "--optimizer"]:
         if value in ["sgd", "momentum", "nag", "rmsprop", "adam", "nadam"]:
             optimizer = value
