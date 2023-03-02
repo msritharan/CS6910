@@ -46,7 +46,7 @@ sweep_configuration = {
     }
 }
 
-sweep_id = wandb.sweep(sweep_configuration, project = "CS6910 A1")
+sweep_id = wandb.sweep(sweep_configuration, project = wandb_project)
 
 def create_and_train_model(config = None):
     with wandb.init(config = config):
@@ -66,4 +66,4 @@ def create_and_train_model(config = None):
             })
 
 
-agent = wandb.agent(sweep_id, function = create_and_train_model, project = "CS6910 A1") 
+agent = wandb.agent(sweep_id, function = create_and_train_model, project = wandb_project) 
