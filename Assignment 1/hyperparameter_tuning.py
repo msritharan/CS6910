@@ -54,8 +54,7 @@ def create_and_train_model(config = None):
         model = FeedforwardNN(config['weight_init'], config['num_hidden_layers'], config['hidden_layer_size'], config['activation'],
                             input_size, output_size, config['loss_function'])
         model.weights, model.bias, train_acc, train_loss, val_acc, val_loss = train_model(model, config['optimizer'], config['learning_rate'], config['batch_size'],
-                                                            config['epochs'], momentum, beta, beta1, beta2, epsilon, Xtrain, Ytrain, 
-                                                            Xval, Yval)
+                                                                                config['epochs'], momentum, beta, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
         for epoch in range(config['epochs']):
             wandb.log({
                 'train_acc': train_acc[epoch],
