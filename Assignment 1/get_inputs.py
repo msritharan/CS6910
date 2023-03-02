@@ -61,7 +61,7 @@ while(pos < len(sys.argv)):
             print("Not a valid number for batch_size")
             print("Proceeding with Default Value.")
     
-    elif variable in ["-b", "--loss"]:
+    elif variable in ["-l", "--loss"]:
         if value in ["mean_squared_error", "cross_entropy"]:
             loss_function = value
         else:
