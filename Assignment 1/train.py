@@ -6,52 +6,55 @@ import numpy as np
 from matplotlib import pyplot as plt
 from keras.datasets import fashion_mnist
 
-# Q1 - load dataset
+# load dataset and process it
 (x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
-x_train = x_train.reshape(60000, -1)/255
+x_train = x_train.reshape(x_train.shape[0], -1)/255
 x_test = x_test.reshape(x_test.shape[0], -1)/255
 
-# plt.figure()
-# plt.imshow(x_train[0], cmap = 'gray')
-# plt.show()
+# split train into train + val
+train_val_split = 0.9
+indices = np.arange(x_train.shape[0])
+np.random.shuffle(indices)
+total_samples = x_train.shape[0]
+Xtrain = np.array([x_train[idx] for idx in range(int(train_val_split*total_samples))])
+Ytrain = np.array([y_train[idx] for idx in range(int(train_val_split*total_samples))])
+Xval = np.array([x_train[idx] for idx in range(int(train_val_split*total_samples), total_samples)])
+Yval = np.array([y_train[idx] for idx in range(int(train_val_split*total_samples), total_samples)])
+Xtest = x_test
+Ytest = y_test
 
-epochs = 10
+print("Train Data Dimensions : ", Xtrain.shape)
+print("Validation Data Dimensions :", Xval.shape)
+print("Test Data Dimensions :", Xtest.shape)
 
-X = x_train[:10000]
-Y = y_train[:10000]
+# write training loop for given inputs
+input_size = 28*28
+output_size = 10
+model = FeedforwardNN(weight_init, num_layers, hidden_size, activation, input_size, output_size, loss_function)
+model.weights, model.bias, train_acc, train_loss, val_acc, val_loss = train_model(model, optimizer, learning_rate, batch_size, epochs, momentum, beta, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
+# train_loss /= Xtrain.shape[0]
+# val_loss /= Xval.shape[0]
 
-# model = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
-# W, b = sgd(model, learning_rate, batch_size, epochs, X, Y, x_test, y_test)
-# model.weights = W
-# model.bias = b
-# print(model.evaluate(x_test, y_test))
+# Visualize training and validation metrics
+plt.figure()
+plt.plot(train_acc, c = 'r', label = 'train_acc')
+plt.plot(val_acc, c = 'g', label = 'val_acc')
+plt.ylabel('Accuracy')
+plt.xlabel('Epochs')
+plt.legend()
+plt.title('Train and Val Accuracies')
+plt.show()
 
-# model1 = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
-# W, b = momentum_sgd(model1, learning_rate, batch_size, epochs, momentum, X, Y, x_test, y_test)
-# model1.weights = W
-# model1.bias = b
-# print(model1.evaluate(x_test, y_test))
+plt.figure()
+plt.plot(train_loss, c = 'r', label = 'train_loss')
+plt.plot(val_loss, c = 'b', label = 'val_loss')
+plt.ylabel('Accuracy')
+plt.xlabel('Epochs')
+plt.legend()
+plt.title('Train and Val Losses')
+plt.show()
 
-# model2 = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
-# W, b = nag(model2, learning_rate, batch_size, epochs, momentum, X, Y, x_test, y_test)
-# model2.weights = W
-# model2.bias = b
-# print(model2.evaluate(x_test, y_test))
-
-# model3 = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
-# W, b = rmsprop(model3, learning_rate, batch_size, epochs, beta, epsilon, X, Y, x_test, y_test)
-# model3.weights = W
-# model3.bias = b
-# print(model3.evaluate(x_test, y_test))
-
-model4 = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
-W, b = adam(model4, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, Y, x_test, y_test)
-model4.weights = W
-model4.bias = b
-print(model4.evaluate(x_test, y_test))
-
-model5 = FeedforwardNN(weight_init, num_layers, hidden_size, activation, 28*28, 10)
-W, b = nadam(model5, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, Y, x_test, y_test)
-model5.weights = W
-model5.bias = b
-print(model5.evaluate(x_test, y_test))
+# evaluate model on test data
+test_acc, test_loss = model.evaluate_metrics(Xtest, Ytest)
+#test_loss /= Xtest.shape[0]
+print("Test Accuracy and Loss : ", test_acc, test_loss)
