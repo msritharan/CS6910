@@ -180,7 +180,7 @@ class FeedforwardNN:
             if pred == Y[idx]:
                 correct += 1
         
-        return float(correct)/len(X), loss
+        return float(correct)/len(X), loss/len(X)
     
 
 
