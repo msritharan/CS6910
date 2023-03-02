@@ -307,3 +307,19 @@ def nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, 
     # plt.show()
     
     return NNmodel.weights, NNmodel.bias
+
+def train_model(NNmodel, optimizer, learning_rate, batch_size, epochs, momentum, beta, beta1, beta2, Xtrain, Ytrain, Xval, Yval):
+    if optimizer == "sgd":
+        NNmodel.weights, NNmodel.bias = sgd(NNmodel, learning_rate, batch_size, epochs, Xtrain, Ytrain, Xval, Yval)
+    elif optimizer == "momentum":
+        NNmodel.weights, NNmodel.bias = momentum_sgd(NNmodel, learning_rate, batch_size, epochs, momentum, Xtrain, Ytrain, Xval, Yval)
+    elif optimizer == "nesterov":
+        NNmodel.weights, NNmodel.bias = nag(NNmodel, learning_rate, batch_size, epochs, momentum, Xtrain, Ytrain, Xval, Yval)
+    elif optimizer == "rmsprop":
+        NNmodel.weights, NNmodel.bias = rmsprop(NNmodel, learning_rate, batch_size, epochs, beta, epsilon, Xtrain, Ytrain, Xval, Yval)
+    elif optimizer == "adam":
+        NNmodel.weights, NNmodel.bias = adam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
+    elif optimizer == "nadam":
+        NNmodel.weights, NNmodel.bias = nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
+
+    return NNmodel.weights, NNmodel.bias
