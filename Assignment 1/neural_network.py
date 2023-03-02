@@ -1,12 +1,13 @@
 import numpy as np
 
 class FeedforwardNN:
-    def __init__(self, weight_init, num_layers, hidden_size, activation, input_size, output_size):
+    def __init__(self, weight_init, num_layers, hidden_size, activation, input_size, output_size, loss_function):
         # all hidden layers have the same size
         self.num_layers = num_layers
         self.input_size = input_size
         self.output_size = output_size
         self.activation = activation
+        self.loss_function = loss_function
         
         # weights between layers
         self.weights = []
@@ -87,7 +88,25 @@ class FeedforwardNN:
             return self.grad_tanh(x)
         elif self.activation == "ReLU":
             return self.grad_ReLU(x)
-        
+
+    # Loss functions
+    def mse_loss(self, y, label):
+        true_value = np.zeros(y.shape)
+        true_value[label] = 1
+        loss = 0.5*np.sum((y - true_value)**2)
+        return loss
+
+    def cross_entropy_loss(self, y, label):
+        loss = -np.log(y[label])
+        return loss
+    
+    # gradients of loss functions
+    def grad_cross_entropy_loss(self, y, true_value):
+        return true_value/y
+
+    def grad_mse_loss(self, y, true_value):
+        return (y - true_value)
+    
     def forward_propagate(self, input):
         h = input
         a_layer = [h] # pre activation outputs of each layer
@@ -113,11 +132,14 @@ class FeedforwardNN:
         L = len(h_layer) - 1
 
         # gradient wrt to a_L
+        g_a = np.zeros(self.output_size)
         e_y = np.zeros(self.output_size)
         e_y[ylabel] = 1
+        if self.loss_function == "mean_squared_error":
+            g_a = np.matmul(self.grad_mse_loss(ypred, e_y), self.grad_softmax(ypred))
+        elif self.loss_function == "cross_entropy":
+            g_a = -(e_y - ypred)
 
-        # propagate backwards
-        g_a = -(e_y - ypred)
         for l in range(L - 1, -1, -1):
             # gradients wrt weights and bias
             g_Wl = np.outer(g_a, h_layer[l])
