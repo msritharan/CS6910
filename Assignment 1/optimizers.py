@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-# from neural_network import *
-# NNmodel = FeedforwardNN()
+
 
 def sgd(NNmodel, learning_rate, batch_size, epochs, Xtrain, Ytrain, Xval, Yval):
     train_accuracy = []
@@ -332,7 +331,7 @@ def nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtr
     
     return NNmodel.weights, NNmodel.bias, train_accuracy, train_loss, val_accuracy, val_loss
 
-def train_model(NNmodel, optimizer, learning_rate, batch_size, epochs, momentum, beta, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval, active_wandb = False):
+def train_model(NNmodel, optimizer, learning_rate, batch_size, epochs, momentum, beta, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval):
     # train_accuracy, train_loss, val_accuracy, val_loss
     if optimizer == "sgd":
         NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss = sgd(NNmodel, learning_rate, batch_size, epochs, Xtrain, Ytrain, Xval, Yval)

@@ -25,6 +25,8 @@ weight_init = "random"
 num_layers = 1
 hidden_size = 4
 activation = "sigmoid"
+input_size = 28*28
+output_size = 10
 
 # Input Arguments
 pos = 2

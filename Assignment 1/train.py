@@ -28,8 +28,6 @@ print("Validation Data Dimensions :", Xval.shape)
 print("Test Data Dimensions :", Xtest.shape)
 
 # write training loop for given inputs
-input_size = 28*28
-output_size = 10
 model = FeedforwardNN(weight_init, num_layers, hidden_size, activation, input_size, output_size, loss_function)
 model.weights, model.bias, train_acc, train_loss, val_acc, val_loss = train_model(model, optimizer, learning_rate, batch_size, epochs, momentum, beta, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
 
