@@ -308,7 +308,7 @@ def nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, X, 
     
     return NNmodel.weights, NNmodel.bias
 
-def train_model(NNmodel, optimizer, learning_rate, batch_size, epochs, momentum, beta, beta1, beta2, Xtrain, Ytrain, Xval, Yval):
+def train_model(NNmodel, optimizer, learning_rate, batch_size, epochs, momentum, beta, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval):
     if optimizer == "sgd":
         NNmodel.weights, NNmodel.bias = sgd(NNmodel, learning_rate, batch_size, epochs, Xtrain, Ytrain, Xval, Yval)
     elif optimizer == "momentum":
