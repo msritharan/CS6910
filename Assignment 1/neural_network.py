@@ -12,8 +12,7 @@ class FeedforwardNN:
         # weights between layers
         self.weights = []
         self.weights.append(np.zeros((hidden_size, input_size)))
-        layer_id = 1
-        while(layer_id < num_layers):
+        for L in range(num_layers - 1):
             self.weights.append(np.zeros((hidden_size, hidden_size)))
         self.weights.append(np.zeros((output_size, hidden_size)))
 
