@@ -334,16 +334,19 @@ def nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtr
 def train_model(NNmodel, optimizer, learning_rate, batch_size, epochs, momentum, beta, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval):
     # train_accuracy, train_loss, val_accuracy, val_loss
     if optimizer == "sgd":
-        NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss = sgd(NNmodel, learning_rate, batch_size, epochs, Xtrain, Ytrain, Xval, Yval)
+        W, b, train_acc, train_loss, val_acc, val_loss = sgd(NNmodel, learning_rate, batch_size, epochs, Xtrain, Ytrain, Xval, Yval)
     elif optimizer == "momentum":
-        NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss = momentum_sgd(NNmodel, learning_rate, batch_size, epochs, momentum, Xtrain, Ytrain, Xval, Yval)
-    elif optimizer == "nesterov":
-        NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss = nag(NNmodel, learning_rate, batch_size, epochs, momentum, Xtrain, Ytrain, Xval, Yval)
+        W, b, train_acc, train_loss, val_acc, val_loss = momentum_sgd(NNmodel, learning_rate, batch_size, epochs, momentum, Xtrain, Ytrain, Xval, Yval)
+    elif optimizer == "nag":
+        W, b, train_acc, train_loss, val_acc, val_loss = nag(NNmodel, learning_rate, batch_size, epochs, momentum, Xtrain, Ytrain, Xval, Yval)
     elif optimizer == "rmsprop":
-        NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss = rmsprop(NNmodel, learning_rate, batch_size, epochs, beta, epsilon, Xtrain, Ytrain, Xval, Yval)
+        W, b, train_acc, train_loss, val_acc, val_loss = rmsprop(NNmodel, learning_rate, batch_size, epochs, beta, epsilon, Xtrain, Ytrain, Xval, Yval)
     elif optimizer == "adam":
-        NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss = adam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
+        W, b, train_acc, train_loss, val_acc, val_loss = adam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
     elif optimizer == "nadam":
-        NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss = nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
+        W, b, train_acc, train_loss, val_acc, val_loss = nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
+
+    NNmodel.weights = W
+    NNmodel.bias = b
 
     return NNmodel.weights, NNmodel.bias, train_acc, train_loss, val_acc, val_loss
