@@ -100,6 +100,12 @@ class FeedforwardNN:
         loss = -np.log(y[label])
         return loss
     
+    def compute_loss(self, y, label):
+        if self.loss_function == "cross_entropy":
+            return self.cross_entropy_loss(y, label)
+        elif self.loss_function == "mean_squared_error":
+            return self.mse_loss(y, label)
+    
     # gradients of loss functions
     def grad_cross_entropy_loss(self, y, true_value):
         return true_value/y
@@ -164,14 +170,19 @@ class FeedforwardNN:
         ypred = np.argmax(y)
         return ypred
     
-    def evaluate(self, X, Y):
+    def evaluate_metrics(self, X, Y):
         correct = 0
+        loss = 0.0
         for idx in range(len(X)):
-            pred = self.predict(X[idx])
+            a, h, y = self.forward_propagate(X[idx])
+            pred = np.argmax(y)
+            loss += self.compute_loss(y, Y[idx])
             if pred == Y[idx]:
                 correct += 1
         
-        return float(correct)/len(X)
+        return float(correct)/len(X), loss
+    
+
 
 
 
