@@ -49,10 +49,18 @@ sweep_configuration = {
 sweep_id = wandb.sweep(sweep_configuration, project = wandb_project)
 
 def create_and_train_model(config = None):
-    with wandb.init(config = config):
+    with wandb.init(config = config) as run:
         config = wandb.config
-        model = FeedforwardNN(config['weight_init'], config['num_hidden_layers'], config['hidden_layer_size'], config['activation'],
-                            input_size, output_size, config['loss_function'])
+
+        # assign name of run
+        name_str = "e_"+ str(config['epochs']) + "_nhl_" + str(config['num_layers']) + "_sz_" + str(config['hidden_size']) + "_w_d_" + str(config['weight_decay'])
+        name_str += "_lr_" + str(config['learning_rate']) + "_o_" + str(config['optimizer']) + "_b_" + str(config['batch_size'])
+        name_str += "_w_i_" + str(config['weight_init']) + "_a_" + str(config['activation']) + "_l_" + str(config['loss']) 
+        run.name = name_str
+
+        # proceed with the run
+        model = FeedforwardNN(config['weight_init'], config['weight_decay'], config['num_layers'], config['hidden_size'], config['activation'],
+                            input_size, output_size, config['loss'])
         model.weights, model.bias, train_acc, train_loss, val_acc, val_loss = train_model(model, config['optimizer'], config['learning_rate'], config['batch_size'],
                                                                                 config['epochs'], momentum, beta, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
         for epoch in range(config['epochs']):
@@ -63,6 +71,5 @@ def create_and_train_model(config = None):
                 'val_loss': val_loss[epoch],
                 'epoch' : epoch
             })
-
 
 agent = wandb.agent(sweep_id, function = create_and_train_model, project = wandb_project) 
