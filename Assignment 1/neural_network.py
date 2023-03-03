@@ -1,14 +1,15 @@
 import numpy as np
 
 class FeedforwardNN:
-    def __init__(self, weight_init, num_layers, hidden_size, activation, input_size, output_size, loss_function):
+    def __init__(self, weight_init, weight_decay, num_layers, hidden_size, activation, input_size, output_size, loss_function):
         # all hidden layers have the same size
         self.num_layers = num_layers
         self.input_size = input_size
         self.output_size = output_size
         self.activation = activation
         self.loss_function = loss_function
-        
+        self.weight_decay = weight_decay
+
         # weights between layers
         self.weights = []
         self.weights.append(np.zeros((hidden_size, input_size)))
@@ -92,7 +93,7 @@ class FeedforwardNN:
     def mse_loss(self, y, label):
         true_value = np.zeros(y.shape)
         true_value[label] = 1
-        loss = 0.5*np.sum((y - true_value)**2)
+        loss = 0.5*np.sum((y - true_value)**2)        
         return loss
 
     def cross_entropy_loss(self, y, label):
