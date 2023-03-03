@@ -30,7 +30,7 @@ print("Test Data Dimensions :", Xtest.shape)
 # Do Hyperparameter Tuning
 sweep_configuration = {
     'name' : 'hyperparameter_tuning',
-    'method' : 'random',
+    'method' : 'bayes',
     'metric': {'name' : 'val_loss', 'goal' : 'minimize'},
     'parameters' : {
         'epochs': { "values" : [5, 10] },
@@ -72,4 +72,4 @@ def create_and_train_model(config = None):
                 'epoch' : epoch
             })
 
-agent = wandb.agent(sweep_id, function = create_and_train_model, project = wandb_project) 
+agent = wandb.agent(sweep_id, function = create_and_train_model, project = wandb_project, count = 100) 
