@@ -9,7 +9,7 @@ class FeedforwardNN:
         self.activation = activation
         self.loss_function = loss_function
         self.weight_decay = weight_decay
-
+        
         # weights between layers
         self.weights = []
         self.weights.append(np.zeros((hidden_size, input_size)))
@@ -106,12 +106,25 @@ class FeedforwardNN:
         elif self.loss_function == "mean_squared_error":
             return self.mse_loss(y, label)
     
+    def compute_weight_loss(self):
+        loss = 0.0
+        for W in self.weights:
+            loss += 0.5*self.weight_decay*np.sum(W**2)
+        for b in self.bias:
+            loss += 0.5*self.weight_decay*np.sum(b**2)
+        return loss
+    
     # gradients of loss functions
     def grad_cross_entropy_loss(self, y, true_value):
         return true_value/y
 
     def grad_mse_loss(self, y, true_value):
         return (y - true_value)
+    
+    def grad_weight_loss(self):
+        gW = [self.weight_decay*W for W in self.weights]
+        gb = [self.weight_decay*b for b in self.bias]
+        return gW, gb
     
     def forward_propagate(self, input):
         h = input
@@ -173,6 +186,7 @@ class FeedforwardNN:
     def evaluate_metrics(self, X, Y):
         correct = 0
         loss = 0.0
+        loss += self.compute_weight_loss()
         for idx in range(len(X)):
             a, h, y = self.forward_propagate(X[idx])
             pred = np.argmax(y)

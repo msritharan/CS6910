@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 def sgd(NNmodel, learning_rate, batch_size, epochs, Xtrain, Ytrain, Xval, Yval):
     train_accuracy = []
     train_loss = []
@@ -27,9 +26,10 @@ def sgd(NNmodel, learning_rate, batch_size, epochs, Xtrain, Ytrain, Xval, Yval):
 
             # end of a batch or end of array
             if ((idx + 1)%batch_size == 0) or (idx == len(Xtrain) - 1):
+                g_weight_loss, g_bias_loss = NNmodel.grad_weight_loss()
                 for idx2 in range(len(W)):
-                    W[idx2] -= learning_rate*gW[idx2]
-                    b[idx2] -= learning_rate*gb[idx2]
+                    W[idx2] -= learning_rate*(gW[idx2] + g_weight_loss[idx2])
+                    b[idx2] -= learning_rate*(gb[idx2] + g_bias_loss[idx2])
 
                 NNmodel.weights = W
                 NNmodel.bias = b
@@ -38,6 +38,7 @@ def sgd(NNmodel, learning_rate, batch_size, epochs, Xtrain, Ytrain, Xval, Yval):
         
         train_acc, train_cost = NNmodel.evaluate_metrics(Xtrain, Ytrain)
         val_acc, val_cost = NNmodel.evaluate_metrics(Xval, Yval)
+    
         print("Epoch : ", iter + 1, "Train Accuracy = ", train_acc, "Val Accuracy = ", val_acc)
         train_accuracy.append(train_acc)
         train_loss.append(train_cost) 
@@ -75,10 +76,10 @@ def momentum_sgd(NNmodel, learning_rate, batch_size, epochs, momentum, Xtrain, Y
             if ((idx + 1)%batch_size == 0) or (idx == len(Xtrain) - 1):
                 update_W = [momentum*hist_update_W[idx] for idx in range(len(hist_update_W))]
                 update_b = [momentum*hist_update_b[idx] for idx in range(len(hist_update_b))]
-
+                g_weight_loss, g_bias_loss = NNmodel.grad_weight_loss()
                 for idx2 in range(len(W)):
-                    update_W[idx2] += gW[idx2]
-                    update_b[idx2] += gb[idx2]
+                    update_W[idx2] += (gW[idx2] + g_weight_loss[idx2])
+                    update_b[idx2] += (gb[idx2] + g_bias_loss[idx2])
                     W[idx2] -= learning_rate*update_W[idx2]
                     b[idx2] -= learning_rate*update_b[idx2]
 
@@ -130,9 +131,10 @@ def nag(NNmodel, learning_rate, batch_size, epochs, momentum, Xtrain, Ytrain, Xv
             # end of a batch or end of array - move by accumulated gradients
             if ((idx + 1)%batch_size == 0) or (idx == len(Xtrain) - 1):
                 # move by gW as you would already moved by beta*u(t - 1) at the end of the previous batch
+                g_weight_loss, g_bias_loss = NNmodel.grad_weight_loss()
                 for idx2 in range(len(W)):
-                    update_W[idx2] += (gW[idx2])
-                    update_b[idx2] += (gb[idx2])
+                    update_W[idx2] += (gW[idx2] + g_weight_loss[idx2])
+                    update_b[idx2] += (gb[idx2] + g_bias_loss[idx2])
                     W[idx2] -= learning_rate*(gW[idx2])
                     b[idx2] -= learning_rate*(gb[idx2])
                 
@@ -189,12 +191,13 @@ def rmsprop(NNmodel, learning_rate, batch_size, epochs, beta, epsilon, Xtrain, Y
 
             # end of a batch or end of array
             if ((idx + 1)%batch_size == 0) or (idx == len(Xtrain) - 1):
+                g_weight_loss, g_bias_loss = NNmodel.grad_weight_loss()
                 for idx2 in range(len(W)):
-                    V_w[idx2] = beta*V_w[idx2] + (1 - beta)*(gW[idx2]**2)
-                    V_b[idx2] = beta*V_b[idx2] + (1 - beta)*(gb[idx2]**2)
+                    V_w[idx2] = beta*V_w[idx2] + (1 - beta)*((gW[idx2] + g_weight_loss[idx2])**2)
+                    V_b[idx2] = beta*V_b[idx2] + (1 - beta)*((gb[idx2] + g_bias_loss[idx2])**2)
                     
-                    W[idx2] -= learning_rate*gW[idx2]/np.sqrt(V_w[idx2] + epsilon)
-                    b[idx2] -= learning_rate*gb[idx2]/np.sqrt(V_b[idx2] + epsilon)
+                    W[idx2] -= learning_rate*(gW[idx2] + g_weight_loss[idx2])/np.sqrt(V_w[idx2] + epsilon)
+                    b[idx2] -= learning_rate*(gb[idx2] + g_bias_loss[idx2])/np.sqrt(V_b[idx2] + epsilon)
 
                 NNmodel.weights = W
                 NNmodel.bias = b
@@ -241,11 +244,12 @@ def adam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtra
 
             # end of a batch or end of array
             if ((idx + 1)%batch_size == 0) or (idx == len(Xtrain) - 1):
+                g_weight_loss, g_bias_loss = NNmodel.grad_weight_loss()
                 for idx2 in range(len(W)):
-                    M_w[idx2] = beta1*M_w[idx2] + (1 - beta1)*(gW[idx2])
-                    M_b[idx2] = beta1*M_b[idx2] + (1 - beta1)*(gb[idx2])
-                    V_w[idx2] = beta2*V_w[idx2] + (1 - beta2)*(gW[idx2]**2)
-                    V_b[idx2] = beta2*V_b[idx2] + (1 - beta2)*(gb[idx2]**2)
+                    M_w[idx2] = beta1*M_w[idx2] + (1 - beta1)*((gW[idx2] + g_weight_loss[idx2]))
+                    M_b[idx2] = beta1*M_b[idx2] + (1 - beta1)*((gb[idx2] + g_bias_loss[idx2]))
+                    V_w[idx2] = beta2*V_w[idx2] + (1 - beta2)*((gW[idx2] + g_weight_loss[idx2])**2)
+                    V_b[idx2] = beta2*V_b[idx2] + (1 - beta2)*((gb[idx2] + g_bias_loss[idx2])**2)
                     
                     normal_M_w = M_w[idx2]/(1 - pow(beta1, t))
                     normal_M_b = M_b[idx2]/(1 - pow(beta1, t))
@@ -301,19 +305,20 @@ def nadam(NNmodel, learning_rate, batch_size, epochs, beta1, beta2, epsilon, Xtr
 
             # end of a batch or end of array
             if ((idx + 1)%batch_size == 0) or (idx == len(Xtrain) - 1):
+                g_weight_loss, g_bias_loss = NNmodel.grad_weight_loss()
                 for idx2 in range(len(W)):
-                    M_w[idx2] = beta1*M_w[idx2] + (1 - beta1)*(gW[idx2])
-                    M_b[idx2] = beta1*M_b[idx2] + (1 - beta1)*(gb[idx2])
-                    V_w[idx2] = beta2*V_w[idx2] + (1 - beta2)*(gW[idx2]**2)
-                    V_b[idx2] = beta2*V_b[idx2] + (1 - beta2)*(gb[idx2]**2)
+                    M_w[idx2] = beta1*M_w[idx2] + (1 - beta1)*((gW[idx2] + g_weight_loss[idx2]))
+                    M_b[idx2] = beta1*M_b[idx2] + (1 - beta1)*((gb[idx2] + g_bias_loss[idx2]))
+                    V_w[idx2] = beta2*V_w[idx2] + (1 - beta2)*((gW[idx2] + g_weight_loss[idx2])**2)
+                    V_b[idx2] = beta2*V_b[idx2] + (1 - beta2)*((gb[idx2] + g_bias_loss[idx2])**2)
                     
                     normal_M_w = M_w[idx2]/(1 - pow(beta1, t))
                     normal_M_b = M_b[idx2]/(1 - pow(beta1, t))
                     normal_V_w = V_w[idx2]/(1 - pow(beta2, t))
                     normal_V_b = V_b[idx2]/(1 - pow(beta2, t))
 
-                    W[idx2] -= learning_rate*(beta1*normal_M_w + (1 - beta1)*gW[idx2]/(1 - pow(beta1, t)))/(np.sqrt(normal_V_w) + epsilon)
-                    b[idx2] -= learning_rate*(beta1*normal_M_b + (1 - beta1)*gb[idx2]/(1 - pow(beta1, t)))/(np.sqrt(normal_V_b) + epsilon)
+                    W[idx2] -= learning_rate*(beta1*normal_M_w + (1 - beta1)*(gW[idx2] + g_weight_loss[idx2])/(1 - pow(beta1, t)))/(np.sqrt(normal_V_w) + epsilon)
+                    b[idx2] -= learning_rate*(beta1*normal_M_b + (1 - beta1)*(gb[idx2] + g_bias_loss[idx2])/(1 - pow(beta1, t)))/(np.sqrt(normal_V_b) + epsilon)
 
                 t += 1
                 NNmodel.weights = W
