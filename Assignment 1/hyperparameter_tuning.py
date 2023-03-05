@@ -42,7 +42,7 @@ sweep_configuration = {
         'batch_size' : { "values" : [16, 32, 64] },
         'weight_init' : { "values" : ["random", "Xavier"] },
         'activation' : { "values" : ["sigmoid", "tanh", "ReLU"] },
-        'loss' : { "values" : ["mean_squared_error", "cross_entropy"] }
+        'loss' : { "values" : ["cross_entropy"] }
     }
 }
 
@@ -55,7 +55,7 @@ def create_and_train_model(config = None):
         # assign name of run
         name_str = "e_"+ str(config['epochs']) + "_nhl_" + str(config['num_layers']) + "_sz_" + str(config['hidden_size']) + "_w_d_" + str(config['weight_decay'])
         name_str += "_lr_" + str(config['learning_rate']) + "_" + str(config['optimizer']) + "_b_" + str(config['batch_size'])
-        name_str += "_" + str(config['weight_init']) + "_" + str(config['activation']) + "_" + str(config['loss']) 
+        name_str += "_" + str(config['weight_init']) + "_" + str(config['activation']) 
         run.name = name_str
 
         # proceed with the run
