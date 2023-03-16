@@ -20,7 +20,7 @@ Xtrain = np.array([x_train[idx] for idx in range(int(train_val_split*total_sampl
 Ytrain = np.array([y_train[idx] for idx in range(int(train_val_split*total_samples))])
 Xval = np.array([x_train[idx] for idx in range(int(train_val_split*total_samples), total_samples)])
 Yval = np.array([y_train[idx] for idx in range(int(train_val_split*total_samples), total_samples)])
-Xtest = x_test
+Xtest = np.array([x_test[idx] for idx in range(len(x_test))])
 Ytest = y_test
 
 print("Train Data Dimensions : ", Xtrain.shape)
