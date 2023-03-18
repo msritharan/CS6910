@@ -9,7 +9,7 @@ class FeedforwardNN:
         self.activation = activation
         self.loss_function = loss_function
         self.weight_decay = weight_decay
-        
+
         # weights between layers
         self.weights = []
         self.weights.append(np.zeros((hidden_size, input_size)))
