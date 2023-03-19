@@ -50,6 +50,7 @@ sweep_configuration = {
     }
 }
 
+
 sweep_id = wandb.sweep(sweep_configuration, project = wandb_project)
 
 def create_and_train_model(config = None):
@@ -76,4 +77,5 @@ def create_and_train_model(config = None):
                 'epoch' : epoch
             })
 
-agent = wandb.agent(sweep_id, function = create_and_train_model, project = wandb_project, count = 100) 
+agent = wandb.agent(sweep_id, function = create_and_train_model, project = wandb_project, count = 100)
+wandb.finish()
