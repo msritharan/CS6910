@@ -1,5 +1,16 @@
+"""
+This file contains the code for the following optimizer functions:
+- Mini-batch Stochastic Gradient Descent (sgd)
+- Momentum based Mini Batch SGD (momentum_sgd)
+- Nesterov Accelerated Mini Batch SGD (nag)
+- RMSprop (rmsprop)
+- Adam (adam)
+- Nadam (nadam)
+
+The file also contains the function train_model() which trains a model using the specified input parameters.
+"""
+
 import numpy as np
-import matplotlib.pyplot as plt
 
 def sgd(NNmodel, learning_rate, batch_size, epochs, Xtrain, Ytrain, Xval, Yval):
     train_accuracy = []

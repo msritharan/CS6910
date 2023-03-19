@@ -1,3 +1,13 @@
+"""
+To run the file: (use the following command structure)
+python hyperparameter_tuning.py --dataset [DATASET_NAME] ...
+
+The below code will do the following:
+- will load the dataset, preprocess it.
+- login to wandb.ai
+- execute hyperparameter sweep and logs the relevant data
+"""
+
 from neural_network import *
 from optimizers import *
 from get_inputs import *

@@ -1,3 +1,10 @@
+"""
+This file is used to train a particular model with a specified set of hyperparameters.
+The file can be run using the following command structure,
+python train.py --dataset [DATASET] ...
+To log the data in wandb.ai, also pass "--use_wandb_train True" in the CLI
+"""
+
 from get_inputs import *
 from neural_network import *
 from optimizers import *
