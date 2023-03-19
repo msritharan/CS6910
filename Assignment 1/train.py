@@ -5,11 +5,17 @@ from optimizers import *
 import numpy as np
 from matplotlib import pyplot as plt
 from keras.datasets import fashion_mnist
+import pandas as pd
+import plotly.express as px
+import matplotlib.colors as mcolors
+import wandb
 
 # load dataset and process it
-(x_train, y_train), (x_test, y_test) = fashion_mnist.load_data()
-x_train = x_train.reshape(x_train.shape[0], -1)/255
-x_test = x_test.reshape(x_test.shape[0], -1)/255
+(x_train_original, y_train_original), (x_test_original, y_test_original) = fashion_mnist.load_data()
+x_train = x_train_original.reshape(x_train_original.shape[0], -1)/255
+y_train = np.copy(y_train_original)
+x_test = x_test_original.reshape(x_test_original.shape[0], -1)/255
+y_test = np.copy(y_test_original)
 
 # split train into train + val
 train_val_split = 0.9
@@ -30,7 +36,7 @@ print("Test Data Dimensions :", Xtest.shape)
 # write training loop for given inputs
 model = FeedforwardNN(weight_init, weight_decay, num_layers, hidden_size, activation, input_size, output_size, loss_function)
 model.weights, model.bias, train_acc, train_loss, val_acc, val_loss = train_model(model, optimizer, learning_rate, batch_size, epochs, momentum, beta, beta1, beta2, epsilon, Xtrain, Ytrain, Xval, Yval)
-
+    
 # Visualize training and validation metrics
 plt.figure()
 plt.plot(train_acc, c = 'r', label = 'train_acc')
@@ -53,3 +59,55 @@ plt.show()
 # evaluate model on test data
 test_acc, test_loss = model.evaluate_metrics(Xtest, Ytest)
 print("Test Accuracy and Loss : ", test_acc, test_loss)
+
+# wandb logs
+if use_wandb_train:
+    wandb.login()
+    with wandb.init() as run:
+        # assign name of the run for easier identification
+        name_str = "e_"+ str(epochs) + "_nhl_" + str(num_layers) + "_sz_" + str(hidden_size) + "_w_d_" + str(weight_decay)
+        name_str += "_lr_" + str(learning_rate) + "_" + str(optimizer) + "_b_" + str(batch_size)
+        name_str += "_" + str(weight_init) + "_" + str(activation)
+        run.name = name_str
+
+        class_names = { 0 : "T-shirt",
+                        1 : "Trouser",
+                        2 : "Pullover",
+                        3 : "Dress",
+                        4 : "Coat",
+                        5 : "Sandal",
+                        6 : "Shirt",
+                        7 : "Sneaker",
+                        8 : "Bag",
+                        9 : "Ankle Boot"}
+        
+        # log input images
+        images = []
+        for idx in range(100):
+            image = wandb.Image(x_train_original[idx])
+            images.append([idx, image, y_train_original[idx], class_names[y_train_original[idx]]])
+        columns = ["idx", "image", "label", "class_name"]
+        img_table = wandb.Table(data= images, columns= columns)
+        wandb.log({ "images_table" : img_table})
+        
+        # log data for generating confusion matrix
+        predictions = []
+        true_labels = []
+        for idx in range(len(Xtest)):
+            predictions.append(model.predict(Xtest[idx]))
+            true_labels.append(Ytest[idx])
+        conf_mat = np.zeros((len(class_names), len(class_names)))
+        for idx in range(len(predictions)):
+            conf_mat[true_labels[idx]][len(class_names) - 1 - predictions[idx]] += 1
+        conf_mat_df = pd.DataFrame(conf_mat, index = [class_names[i] for i in range(10)], columns = [class_names[len(class_names) - 1 - i] for i in range(10)])
+        table = wandb.Table(columns = ["plotly_figure"])
+        path_to_plotly_html = "./plotly_figure.html"
+        fig = px.imshow(conf_mat_df, color_continuous_scale = "RdYlGn", contrast_rescaling = 'minmax', title= "Confusion Matrix (Predictions vs True Labels)")
+        fig.write_html(path_to_plotly_html, auto_play = False)
+        table.add_data(wandb.Html(path_to_plotly_html))
+        wandb.log({"test_table": table})
+        
+        # log train and test plots
+        epochs = list(range(len(val_acc)))
+        wandb.log({"Run Accuracy Plots" : wandb.plot.line_series(xs = epochs, ys = [train_acc, val_acc],
+                                        keys = ["train_acc", "val_acc"], title = "Accuracy vs Epoch", xname= "Epochs")})
