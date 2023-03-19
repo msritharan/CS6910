@@ -5,13 +5,16 @@ from optimizers import *
 import numpy as np
 from matplotlib import pyplot as plt
 from keras.datasets import fashion_mnist
+from keras.datasets import mnist
 import pandas as pd
 import plotly.express as px
-import matplotlib.colors as mcolors
 import wandb
 
 # load dataset and process it
-(x_train_original, y_train_original), (x_test_original, y_test_original) = fashion_mnist.load_data()
+if dataset == "fashion_mnist":
+    (x_train_original, y_train_original), (x_test_original, y_test_original) = fashion_mnist.load_data()
+elif dataset == "mnist":
+    (x_train_original, y_train_original), (x_test_original, y_test_original) = mnist.load_data()
 x_train = x_train_original.reshape(x_train_original.shape[0], -1)/255
 y_train = np.copy(y_train_original)
 x_test = x_test_original.reshape(x_test_original.shape[0], -1)/255
@@ -67,19 +70,31 @@ if use_wandb_train:
         # assign name of the run for easier identification
         name_str = "e_"+ str(epochs) + "_nhl_" + str(num_layers) + "_sz_" + str(hidden_size) + "_w_d_" + str(weight_decay)
         name_str += "_lr_" + str(learning_rate) + "_" + str(optimizer) + "_b_" + str(batch_size)
-        name_str += "_" + str(weight_init) + "_" + str(activation)
+        name_str += "_" + str(weight_init) + "_" + str(activation) + "_" + dataset
         run.name = name_str
 
-        class_names = { 0 : "T-shirt",
-                        1 : "Trouser",
-                        2 : "Pullover",
-                        3 : "Dress",
-                        4 : "Coat",
-                        5 : "Sandal",
-                        6 : "Shirt",
-                        7 : "Sneaker",
-                        8 : "Bag",
-                        9 : "Ankle Boot"}
+        if dataset == "fashion_mnist":
+            class_names = { 0 : "T-shirt",
+                            1 : "Trouser",
+                            2 : "Pullover",
+                            3 : "Dress",
+                            4 : "Coat",
+                            5 : "Sandal",
+                            6 : "Shirt",
+                            7 : "Sneaker",
+                            8 : "Bag",
+                            9 : "Ankle Boot"}
+        elif dataset == "mnist":
+            class_names = { 0 : "0",
+                            1 : "1",
+                            2 : "2",
+                            3 : "3",
+                            4 : "4",
+                            5 : "5",
+                            6 : "6",
+                            7 : "7",
+                            8 : "8",
+                            9 : "9"}
         
         # log input images
         images = []

@@ -10,24 +10,25 @@ import sys
 wandb_project = "CS6910 Assignment 1"
 wandb_entity = "manikandan_sritharan"
 dataset = "fashion_mnist"
-epochs = 1
-batch_size = 4
+epochs = 10
+batch_size = 64
 loss_function = "cross_entropy"
-optimizer = "sgd"
-learning_rate = 0.1
+optimizer = "nadam"
+learning_rate = 0.001
 momentum = 0.5
 beta = 0.5
 beta1 = 0.5
 beta2 = 0.5
 epsilon = 0.000001
-weight_decay = 0.0
-weight_init = "random"
-num_layers = 1
-hidden_size = 4
-activation = "sigmoid"
+weight_decay = 0.0005
+weight_init = "Xavier"
+num_layers = 3
+hidden_size = 128
+activation = "tanh"
 input_size = 28*28
 output_size = 10
 use_wandb_train = False
+custom_run_name = ""
 
 # Input Arguments
 pos = 2
@@ -161,7 +162,7 @@ while(pos < len(sys.argv)):
         else:
             print("Invalid Choice for use_wandb_train")
             print("Proceeding with default value = False")
-            
+        
     else:
         print("Unknown argument :", variable)
         print("Ignoring argument.")
