@@ -27,6 +27,7 @@ hidden_size = 4
 activation = "sigmoid"
 input_size = 28*28
 output_size = 10
+use_wandb_train = False
 
 # Input Arguments
 pos = 2
@@ -154,6 +155,13 @@ while(pos < len(sys.argv)):
             print("Invalid Choice for activation.")
             print("Assigning Default Value = sigmoid")
     
+    elif variable in ["--use_wandb_train"]:
+        if value in ["True", "False"]:
+            use_wandb_train = (value == "True")
+        else:
+            print("Invalid Choice for use_wandb_train")
+            print("Proceeding with default value = False")
+            
     else:
         print("Unknown argument :", variable)
         print("Ignoring argument.")
