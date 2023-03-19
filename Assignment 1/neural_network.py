@@ -1,3 +1,7 @@
+"""
+This file contains the code for the class FeedforwardNN.
+"""
+
 import numpy as np
 
 class FeedforwardNN:
