@@ -27,8 +27,8 @@ hidden_size = 128
 activation = "tanh"
 input_size = 28*28
 output_size = 10
-use_wandb_train = False
-custom_run_name = ""
+use_wandb_train = True
+sweep_runs = 3
 
 # Input Arguments
 pos = 2
@@ -41,7 +41,7 @@ while(pos < len(sys.argv)):
     if variable in ["-wp", "--wandb_project"]:
         wandb_project = value
 
-    elif variable in ["-we", "--wand_entity"]:
+    elif variable in ["-we", "--wandb_entity"]:
         wandb_entity = value
 
     elif variable in ["-d", "--dataset"]:
@@ -162,6 +162,13 @@ while(pos < len(sys.argv)):
         else:
             print("Invalid Choice for use_wandb_train")
             print("Proceeding with default value = False")
+
+    elif variable in ["-sr", "--sweep_runs"]:
+        try:
+            sweep_runs = int(value)
+        except ValueError:
+            print("Not a valid int for sweep_runs")
+            print("Proceeding with Default Value of 3.")
         
     else:
         print("Unknown argument :", variable)

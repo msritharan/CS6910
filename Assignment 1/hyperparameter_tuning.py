@@ -104,5 +104,5 @@ def create_and_train_model(config = None):
                 'epoch' : epoch
             })
 
-agent = wandb.agent(sweep_id, function = create_and_train_model, project = wandb_project, count = 100)
+agent = wandb.agent(sweep_id, function = create_and_train_model, project = wandb_project, count = sweep_runs)
 wandb.finish()
