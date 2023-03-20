@@ -15,7 +15,7 @@ import numpy as np
 from keras.datasets import fashion_mnist
 from keras.datasets import mnist
 import wandb
-wandb.login()
+# wandb.login()
 
 # Load Dataset
 if dataset == "fashion_mnist":
@@ -60,11 +60,28 @@ sweep_configuration = {
     }
 }
 
+sweep_configuration = {
+    'name' : 'hyperparameter_tuning',
+    'method' : 'bayes',
+    'metric': {'name' : 'val_loss', 'goal' : 'minimize'},
+    'parameters' : {
+        'epochs': { "values" : [5] },
+        'num_layers': { "values" : [3] },
+        'hidden_size': { "values" : [32] },
+        'weight_decay': { "values" : [0.0005] },
+        'learning_rate': { "values" : [1e-3] },
+        'optimizer' : { "values" : ["nadam"] },
+        'batch_size' : { "values" : [16] },
+        'weight_init' : { "values" : ["Xavier"] },
+        'activation' : { "values" : ["tanh"] },
+        'loss' : { "values" : ["cross_entropy"] }
+    }
+}
 
 sweep_id = wandb.sweep(sweep_configuration, project = wandb_project)
 
 def create_and_train_model(config = None):
-    with wandb.init(config = config) as run:
+    with wandb.init(config = config, entity = wandb_entity, project = wandb_project) as run:
         config = wandb.config
 
         # assign name of run

@@ -72,12 +72,12 @@ print("Test Accuracy and Loss : ", test_acc, test_loss)
 
 # wandb logs
 if use_wandb_train:
-    wandb.login()
-    with wandb.init() as run:
+    # wandb.login()
+    with wandb.init(entity = wandb_entity, project = wandb_project) as run:
         # assign name of the run for easier identification
         name_str = "e_"+ str(epochs) + "_nhl_" + str(num_layers) + "_sz_" + str(hidden_size) + "_w_d_" + str(weight_decay)
         name_str += "_lr_" + str(learning_rate) + "_" + str(optimizer) + "_b_" + str(batch_size)
-        name_str += "_" + str(weight_init) + "_" + str(activation) + "_" + dataset
+        name_str += "_" + str(weight_init) + "_" + str(activation) + "_" + dataset + "_" + loss_function
         run.name = name_str
 
         if dataset == "fashion_mnist":
