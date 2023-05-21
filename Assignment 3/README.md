@@ -18,3 +18,6 @@ To run the code without WandB, uncomment the commented out part before the "Wand
 ## Predictions on Test Data
 
 The predictions of the models on the test data has been uploaded to the predictions_vanilla and predictions_attention folders respectively
+
+## References
+https://pytorch.org/tutorials/intermediate/seq2seq_translation_tutorial.html
